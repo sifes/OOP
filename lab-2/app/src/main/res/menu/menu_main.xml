@@ -1,0 +1,37 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.lab_2.MainActivity">
+
+  <item
+      android:id="@+id/pointSelect"
+      android:title="@string/point"
+      android:orderInCategory="1"
+      app:showAsAction="never"
+      android:icon="@drawable/point_disabled"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/ellipseSelect"
+      android:title="@string/ellipse"
+      android:orderInCategory="2"
+      app:showAsAction="never"
+      android:icon="@drawable/ellipse_disabled"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/lineSelect"
+      android:title="@string/line"
+      android:orderInCategory="3"
+      app:showAsAction="never"
+      android:icon="@drawable/line_disabled"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/rectSelect"
+      android:title="@string/rect"
+      android:orderInCategory="4"
+      app:showAsAction="never"
+      android:icon="@drawable/rect_disabled"
+      android:checkable="true"/>
+</menu>
