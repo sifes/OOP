@@ -1,0 +1,55 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.lab_3.MainActivity">
+  <item
+      android:id="@+id/pointSelect"
+      android:title="@string/point"
+      app:showAsAction="never"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/ellipseSelect"
+      android:title="@string/ellipse"
+      app:showAsAction="never"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/lineSelect"
+      android:title="@string/line"
+      app:showAsAction="never"
+      android:checkable="true"/>
+
+  <item
+      android:id="@+id/rectSelect"
+      android:title="@string/rect"
+      app:showAsAction="never"
+      android:checkable="true"/>
+
+
+  <item
+      android:title="@string/point"
+      android:id="@+id/dotIcon"
+      app:showAsAction="always"
+      app:tooltipText="Намалювати крапку"
+      android:icon="@drawable/point_disabled"/>
+  <item
+      android:title="@string/line"
+      android:id="@+id/lineIcon"
+      app:showAsAction="always"
+      app:tooltipText="Намалювати лінію"
+      android:icon="@drawable/line_disabled"/>
+  <item
+      android:title="@string/rect"
+      android:id="@+id/rectangleIcon"
+      app:showAsAction="always"
+      app:tooltipText="Намалювати прямокутник"
+      android:icon="@drawable/rect_disabled"/>
+  <item
+      android:title="@string/ellipse"
+      android:id="@+id/ellipseIcon"
+      app:showAsAction="always"
+      app:tooltipText="Намалювати еліпс"
+      android:icon="@drawable/ellipse_disabled"/>
+
+</menu>
