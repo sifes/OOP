@@ -8,12 +8,32 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import android.widget.Toast
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : AppCompatActivity() {
   private lateinit var customCanvas: CustomCanvas
   private var currentShape: CustomCanvas.ShapeOption = CustomCanvas.ShapeOption.POINT
   private lateinit var mainMenu: Menu
-  private var menuItemMap: MutableMap<Int, CustomCanvas.ShapeOption> = mutableMapOf()
+  private lateinit var shapeInfoMap: Map<CustomCanvas.ShapeOption, ShapeInfo>
+  private var currentToast: Toast? = null
+
+  private val menuItemMap: MutableMap<Int, CustomCanvas.ShapeOption> = mutableMapOf(
+    R.id.ellipseSelect to CustomCanvas.ShapeOption.ELLIPSE,
+    R.id.lineSelect to CustomCanvas.ShapeOption.LINE,
+    R.id.pointSelect to CustomCanvas.ShapeOption.POINT,
+    R.id.rectSelect to CustomCanvas.ShapeOption.RECT,
+    R.id.cubeSelect to CustomCanvas.ShapeOption.CUBE,
+    R.id.lineCirclesSelect to CustomCanvas.ShapeOption.LINE_CIRCLES,
+  )
+
+  data class ShapeInfo(
+    val iconId: Int,
+    val title: String,
+    val enabledIconResId: Int,
+    val disabledIconResId: Int
+  )
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -22,122 +42,102 @@ class MainActivity : AppCompatActivity() {
     val toolbar: Toolbar = findViewById(R.id.toolbar)
     setSupportActionBar(toolbar)
 
+    shapeInfoMap = mapOf(
+      CustomCanvas.ShapeOption.POINT to ShapeInfo(R.id.pointIcon, getString(R.string.point), R.drawable.point, R.drawable.point_disabled),
+      CustomCanvas.ShapeOption.LINE to ShapeInfo(R.id.lineIcon, getString(R.string.line), R.drawable.line, R.drawable.line_disabled),
+      CustomCanvas.ShapeOption.RECT to ShapeInfo(R.id.rectIcon, getString(R.string.rect), R.drawable.rect, R.drawable.rect_disabled),
+      CustomCanvas.ShapeOption.ELLIPSE to ShapeInfo(R.id.ellipseIcon, getString(R.string.ellipse), R.drawable.ellipse, R.drawable.ellipse_disabled),
+      CustomCanvas.ShapeOption.CUBE to ShapeInfo(R.id.cubeIcon, getString(R.string.cube), R.drawable.cube, R.drawable.cube_disabled),
+      CustomCanvas.ShapeOption.LINE_CIRCLES to ShapeInfo(R.id.lineCirclesIcon, getString(R.string.line_circles), R.drawable.line_circles, R.drawable.line_circles_disabled)
+    )
+
     customCanvas = findViewById(R.id.customCanvas)
-    customCanvas.setShapeInEditor(currentShape)
+    customCanvas.setShapeEditor(currentShape)
+    showSystemBars()
   }
 
   private fun setCurrentShape(primitive: CustomCanvas.ShapeOption) {
-    currentShape = primitive
-    customCanvas.setShapeInEditor(currentShape)
-    updateMenuCheckState(currentShape)
-    updateToolbarIconState(currentShape)
-    updateToolbarTitle(currentShape)
+    if (currentShape != primitive) {
+      currentShape = primitive
+      customCanvas.setShapeEditor(currentShape)
+      updateMenuCheckState(currentShape)
+      updateToolbar(currentShape)
+      showCustomNotify(currentShape)
+    }
+
     showCustomNotify(currentShape)
   }
 
   private fun updateMenuCheckState(selectedOption: CustomCanvas.ShapeOption) {
-    menuItemMap.values.forEach { mainMenu.findItem(getMenuItemId(it))?.isChecked = false }
-    mainMenu.findItem(getMenuItemId(selectedOption))?.isChecked = true
+    val selectedMenuItemId = menuItemMap.entries.find { it.value == selectedOption }?.key
+    menuItemMap.keys.forEach { menuItemId ->
+      mainMenu.findItem(menuItemId)?.isChecked = (menuItemId == selectedMenuItemId)
+    }
   }
+
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     menuInflater.inflate(R.menu.menu_main, menu)
     mainMenu = menu!!
 
-    menuItemMap[R.id.ellipseSelect] = CustomCanvas.ShapeOption.ELLIPSE
-    menuItemMap[R.id.lineSelect] = CustomCanvas.ShapeOption.LINE
-    menuItemMap[R.id.pointSelect] = CustomCanvas.ShapeOption.POINT
-    menuItemMap[R.id.rectSelect] = CustomCanvas.ShapeOption.RECT
-    menuItemMap[R.id.lineCirclesSelect] = CustomCanvas.ShapeOption.LINE_CIRCLES
-    menuItemMap[R.id.cubeSelect] = CustomCanvas.ShapeOption.CUBE
-
-    updateToolbarIconState(currentShape)
+    updateToolbar(currentShape)
     updateMenuCheckState(currentShape)
-    updateToolbarTitle(currentShape)
     showCustomNotify(currentShape)
 
     return true
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.dotIcon -> setCurrentShape(CustomCanvas.ShapeOption.POINT)
-      R.id.lineIcon -> setCurrentShape(CustomCanvas.ShapeOption.LINE)
-      R.id.rectIcon -> setCurrentShape(CustomCanvas.ShapeOption.RECT)
-      R.id.ellipseIcon -> setCurrentShape(CustomCanvas.ShapeOption.ELLIPSE)
-      R.id.lineCirclesIcon -> setCurrentShape(CustomCanvas.ShapeOption.LINE_CIRCLES)
-      R.id.cubeIcon -> setCurrentShape(CustomCanvas.ShapeOption.CUBE) // Handle Cube selection
-      else -> {
-        menuItemMap[item.itemId]?.let { setCurrentShape(it) }
+    val selectedPrimitive = menuItemMap[item.itemId]
+    if (selectedPrimitive == null) {
+      for ((shapeOption, shapeInfo) in shapeInfoMap) {
+        if (shapeInfo.iconId == item.itemId) {
+          setCurrentShape(shapeOption)
+          return true
+        }
       }
+    } else {
+      setCurrentShape(selectedPrimitive)
+      return true
     }
 
     return super.onOptionsItemSelected(item)
   }
 
-  private fun updateToolbarIconState(selectedShape: CustomCanvas.ShapeOption) {
-    mainMenu.findItem(R.id.dotIcon).setIcon(R.drawable.point_disabled)
-    mainMenu.findItem(R.id.lineIcon).setIcon(R.drawable.line_disabled)
-    mainMenu.findItem(R.id.rectIcon).setIcon(R.drawable.rect_disabled)
-    mainMenu.findItem(R.id.ellipseIcon).setIcon(R.drawable.ellipse_disabled)
-    mainMenu.findItem(R.id.lineCirclesIcon).setIcon(R.drawable.line_circles_disabled)
-    mainMenu.findItem(R.id.cubeIcon).setIcon(R.drawable.cube_disabled) // Added Cube disabled icon
+  private fun updateToolbar(selectedShape: CustomCanvas.ShapeOption) {
+    val selectedShapeInfo = shapeInfoMap[selectedShape]
 
-    when (selectedShape) {
-      CustomCanvas.ShapeOption.POINT -> mainMenu.findItem(R.id.dotIcon).setIcon(R.drawable.point)
-      CustomCanvas.ShapeOption.LINE -> mainMenu.findItem(R.id.lineIcon).setIcon(R.drawable.line)
-      CustomCanvas.ShapeOption.RECT -> mainMenu.findItem(R.id.rectIcon).setIcon(R.drawable.rect)
-      CustomCanvas.ShapeOption.ELLIPSE -> mainMenu.findItem(R.id.ellipseIcon).setIcon(R.drawable.ellipse)
-      CustomCanvas.ShapeOption.LINE_CIRCLES -> mainMenu.findItem(R.id.lineCirclesIcon).setIcon(R.drawable.line_circles)
-      CustomCanvas.ShapeOption.CUBE -> mainMenu.findItem(R.id.cubeIcon).setIcon(R.drawable.cube) // Set Cube icon
+    shapeInfoMap.values.forEach { shapeInfo ->
+      mainMenu.findItem(shapeInfo.iconId).setIcon(shapeInfo.disabledIconResId)
+    }
+
+    selectedShapeInfo?.let {
+      supportActionBar?.title = it.title
+      setToolbarIcon(it.enabledIconResId)
+      mainMenu.findItem(it.iconId).setIcon(it.enabledIconResId)
     }
   }
 
-  private fun updateToolbarTitle(selectedShape: CustomCanvas.ShapeOption) {
-    val title = getShapeTitle(selectedShape)
-    val iconResId = getShapeIconResId(selectedShape)
-
-    supportActionBar?.title = title
-    setToolbarIcon(iconResId)
-  }
 
   private fun showCustomNotify(selectedShape: CustomCanvas.ShapeOption) {
-    val title = getShapeTitle(selectedShape)
-    val toastLayout = layoutInflater.inflate(R.layout.custom_toast, null)
-    val toastIcon = toastLayout.findViewById<ImageView>(R.id.toast_icon)
-    val toastMessage = toastLayout.findViewById<TextView>(R.id.toast_message)
+    val shapeInfo = shapeInfoMap[selectedShape]
 
-    val iconResId = getShapeIconResId(selectedShape)
+    shapeInfo?.let {
+      currentToast?.cancel()
 
-    toastIcon.setImageResource(iconResId)
-    toastMessage.text = title
+      val toastLayout = layoutInflater.inflate(R.layout.custom_toast, null)
+      val toastIcon = toastLayout.findViewById<ImageView>(R.id.toast_icon)
+      val toastMessage = toastLayout.findViewById<TextView>(R.id.toast_message)
 
-    val toast = Toast(this).apply {
-      duration = Toast.LENGTH_SHORT
-      view = toastLayout
-    }
-    toast.show()
-  }
+      toastIcon.setImageResource(it.enabledIconResId)
+      toastMessage.text = it.title
 
-  private fun getShapeTitle(selectedShape: CustomCanvas.ShapeOption): String {
-    return when (selectedShape) {
-      CustomCanvas.ShapeOption.POINT -> getString(R.string.point)
-      CustomCanvas.ShapeOption.LINE -> getString(R.string.line)
-      CustomCanvas.ShapeOption.RECT -> getString(R.string.rect)
-      CustomCanvas.ShapeOption.ELLIPSE -> getString(R.string.ellipse)
-      CustomCanvas.ShapeOption.LINE_CIRCLES -> getString(R.string.line_circles)
-      CustomCanvas.ShapeOption.CUBE -> getString(R.string.cube) // Added Cube title
-    }
-  }
+      currentToast = Toast(this).apply {
+        duration = Toast.LENGTH_SHORT
+        view = toastLayout
+      }
 
-  private fun getShapeIconResId(selectedShape: CustomCanvas.ShapeOption): Int {
-    return when (selectedShape) {
-      CustomCanvas.ShapeOption.POINT -> R.drawable.point
-      CustomCanvas.ShapeOption.LINE -> R.drawable.line
-      CustomCanvas.ShapeOption.RECT -> R.drawable.rect
-      CustomCanvas.ShapeOption.ELLIPSE -> R.drawable.ellipse
-      CustomCanvas.ShapeOption.LINE_CIRCLES -> R.drawable.line_circles
-      CustomCanvas.ShapeOption.CUBE -> R.drawable.cube
+      currentToast?.show()
     }
   }
 
@@ -148,14 +148,8 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun getMenuItemId(option: CustomCanvas.ShapeOption): Int {
-    return when (option) {
-      CustomCanvas.ShapeOption.ELLIPSE -> R.id.ellipseSelect
-      CustomCanvas.ShapeOption.LINE -> R.id.lineSelect
-      CustomCanvas.ShapeOption.POINT -> R.id.pointSelect
-      CustomCanvas.ShapeOption.RECT -> R.id.rectSelect
-      CustomCanvas.ShapeOption.LINE_CIRCLES -> R.id.lineCirclesSelect
-      CustomCanvas.ShapeOption.CUBE -> R.id.cubeSelect
-    }
+  private fun showSystemBars() {
+    WindowCompat.setDecorFitsSystemWindows(window, true)
+    WindowInsetsControllerCompat(window, customCanvas).show(WindowInsetsCompat.Type.systemBars())
   }
 }

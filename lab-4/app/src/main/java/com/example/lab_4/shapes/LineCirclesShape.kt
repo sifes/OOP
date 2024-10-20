@@ -5,13 +5,11 @@ import android.graphics.Color
 import android.graphics.Paint
 
 class LineCirclesShape(override val paint: Paint) : LineShape(paint) {
-    private val r = 20f
-
     override fun draw (canvas: Canvas) {
         super.draw(canvas)
         setDrawConfig()
-        canvas.drawCircle(startX, startY, r, paint)
-        canvas.drawCircle(endX, endY, r, paint)
+        canvas.drawCircle(startX, startY, 20f, paint)
+        canvas.drawCircle(endX, endY, 20f, paint)
     }
 
     override fun setDrawConfig () {

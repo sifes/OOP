@@ -30,39 +30,42 @@ class CustomCanvas @JvmOverloads constructor(
         strokeJoin = Paint.Join.ROUND
     }
 
-    private var currentX = 0f
-    private var currentY = 0f
-
     private val shapes = mutableListOf<Shape>()
-
     private var shapeEditor = MyEditor(paint, shapes)
 
     enum class ShapeOption {
         POINT, LINE, RECT, ELLIPSE, LINE_CIRCLES, CUBE
     }
 
+    private val shapeMap = mapOf(
+        ShapeOption.POINT to { PointShape(paint) },
+        ShapeOption.LINE to { LineShape(paint) },
+        ShapeOption.RECT to { RectShape(paint) },
+        ShapeOption.ELLIPSE to { EllipseShape(paint) },
+        ShapeOption.LINE_CIRCLES to { LineCirclesShape(paint) },
+        ShapeOption.CUBE to { CubeShape(paint) }
+    )
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        currentX = event.x
-        currentY = event.y
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                handleTouchStart()
+                handleTouchStart(event.x, event.y)
                 performClick()
             }
-            MotionEvent.ACTION_MOVE -> onMouseMove()
+            MotionEvent.ACTION_MOVE -> handleTouchMove(event.x, event.y)
             MotionEvent.ACTION_UP -> handleTouchUp()
         }
         return true
     }
 
-    private fun handleTouchStart() {
+    private fun handleTouchStart(x: Float, y: Float) {
+        shapeEditor.onTouchDown(x, y)
         invalidate()
-        shapeEditor.onTouchDown(currentX, currentY)
     }
 
-    private fun onMouseMove() {
+    private fun handleTouchMove(x: Float, y: Float) {
+        shapeEditor.onMouseMove(x, y)
         invalidate()
-        shapeEditor.onMouseMove(currentX, currentY)
     }
 
     private fun handleTouchUp() {
@@ -70,15 +73,8 @@ class CustomCanvas @JvmOverloads constructor(
         shapeEditor.onTouchUp()
     }
 
-    fun setShapeInEditor(selectedShape: ShapeOption) {
-        val shape = when (selectedShape) {
-            ShapeOption.POINT -> PointShape(paint)
-            ShapeOption.LINE -> LineShape(paint)
-            ShapeOption.RECT -> RectShape(paint)
-            ShapeOption.ELLIPSE -> EllipseShape(paint)
-            ShapeOption.LINE_CIRCLES -> LineCirclesShape(paint)
-            ShapeOption.CUBE -> CubeShape(paint)
-        }
+    fun setShapeEditor(selectedShape: ShapeOption) {
+        val shape = shapeMap[selectedShape]?.invoke() ?: return
         shapeEditor.setCurrentShape(shape)
     }
 
@@ -87,9 +83,6 @@ class CustomCanvas @JvmOverloads constructor(
         shapes.forEach { shape ->
             shape.draw(canvas)
         }
-    }
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
     }
 
     override fun performClick(): Boolean {
