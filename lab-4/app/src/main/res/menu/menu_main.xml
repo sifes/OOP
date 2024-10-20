@@ -53,7 +53,7 @@
       />
   <item
       android:title="@string/point"
-      android:id="@+id/dotIcon"
+      android:id="@+id/pointIcon"
       app:showAsAction="always"
       app:tooltipText="Намалювати крапку"
       android:icon="@drawable/point_disabled"/>

@@ -13,6 +13,7 @@ open class Shape (open val paint : Paint) {
     protected var endY: Float = 0f
 
     protected var rubbedTrace = true
+
     fun toggleRubbedTrace() {
         rubbedTrace = !rubbedTrace
     }
