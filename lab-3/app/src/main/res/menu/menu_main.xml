@@ -29,7 +29,7 @@
 
   <item
       android:title="@string/point"
-      android:id="@+id/dotIcon"
+      android:id="@+id/pointIcon"
       app:showAsAction="always"
       app:tooltipText="Намалювати крапку"
       android:icon="@drawable/point_disabled"/>
@@ -41,7 +41,7 @@
       android:icon="@drawable/line_disabled"/>
   <item
       android:title="@string/rect"
-      android:id="@+id/rectangleIcon"
+      android:id="@+id/rectIcon"
       app:showAsAction="always"
       app:tooltipText="Намалювати прямокутник"
       android:icon="@drawable/rect_disabled"/>
