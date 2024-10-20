@@ -10,8 +10,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var customCanvas: CustomCanvas
     private var currentShape: CustomCanvas.ShapeOption = CustomCanvas.ShapeOption.POINT
     private lateinit var mainMenu: Menu
-    private var menuItemMap: MutableMap<Int, CustomCanvas.ShapeOption> = mutableMapOf()
-
+    private val menuItemMap: MutableMap<Int, CustomCanvas.ShapeOption> = mutableMapOf(
+        R.id.ellipseSelect to CustomCanvas.ShapeOption.ELLIPSE,
+        R.id.lineSelect to CustomCanvas.ShapeOption.LINE,
+        R.id.pointSelect to CustomCanvas.ShapeOption.POINT,
+        R.id.rectSelect to CustomCanvas.ShapeOption.RECTANGLE
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,34 +28,26 @@ class MainActivity : AppCompatActivity() {
         customCanvas.setShapeEditor(currentShape)
     }
 
-    private fun setCurrentShape (primitive: CustomCanvas.ShapeOption) {
+    private fun setCurrentShape(primitive: CustomCanvas.ShapeOption) {
         currentShape = primitive
         customCanvas.setShapeEditor(currentShape)
         updateMenuCheckState(currentShape)
     }
 
-    private fun updateMenuCheckState (selectedOption: CustomCanvas.ShapeOption) {
-        menuItemMap.values.forEach { mainMenu.findItem(getMenuItemId(it))?.isChecked = false }
-        mainMenu.findItem(getMenuItemId(selectedOption))?.isChecked = true
-    }
+    private fun updateMenuCheckState(selectedOption: CustomCanvas.ShapeOption) {
+        menuItemMap.keys.forEach { menuItemId ->
+            mainMenu.findItem(menuItemId)?.isChecked = false
+        }
 
-    private fun getMenuItemId (option: CustomCanvas.ShapeOption): Int {
-        return when (option) {
-            CustomCanvas.ShapeOption.ELLIPSE -> R.id.ellipseSelect
-            CustomCanvas.ShapeOption.LINE -> R.id.lineSelect
-            CustomCanvas.ShapeOption.POINT -> R.id.pointSelect
-            CustomCanvas.ShapeOption.RECTANGLE -> R.id.rectSelect
+        val selectedMenuItemId = menuItemMap.entries.find { it.value == selectedOption }?.key
+        selectedMenuItemId?.let {
+            mainMenu.findItem(it)?.isChecked = true
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         mainMenu = menu!!
-
-        menuItemMap[R.id.ellipseSelect] = CustomCanvas.ShapeOption.ELLIPSE
-        menuItemMap[R.id.lineSelect] = CustomCanvas.ShapeOption.LINE
-        menuItemMap[R.id.pointSelect] = CustomCanvas.ShapeOption.POINT
-        menuItemMap[R.id.rectSelect] = CustomCanvas.ShapeOption.RECTANGLE
 
         updateMenuCheckState(currentShape)
         return true
@@ -61,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         val selectedPrimitive = menuItemMap[item.itemId]
         if (selectedPrimitive != null) {
             setCurrentShape(selectedPrimitive)
-            updateMenuCheckState(selectedPrimitive)
         }
 
         return super.onOptionsItemSelected(item)
