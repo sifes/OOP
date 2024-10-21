@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import kotlin.math.roundToInt
 
 open class Shape (open val paint : Paint) {
     protected var startX: Float = 0f
@@ -40,5 +41,9 @@ open class Shape (open val paint : Paint) {
             pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
             strokeWidth = 5f
         }
+    }
+
+    fun getCoords(): Pair<Pair<Int, Int>, Pair<Int, Int>> {
+        return Pair(Pair(startX.roundToInt(), startY.roundToInt()), Pair(endX.roundToInt(), endY.roundToInt()))
     }
 }
