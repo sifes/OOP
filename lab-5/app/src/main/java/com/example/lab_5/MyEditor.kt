@@ -3,7 +3,24 @@ package com.example.lab_5
 import android.graphics.Paint
 import com.example.lab_5.shapes.Shape
 
-class MyEditor(private val paint: Paint, private val shapes: MutableList<Shape>) {
+class MyEditor private constructor (private val paint: Paint, private val shapes: MutableList<Shape>) {
+    companion object {
+        @Volatile
+        private var instance: MyEditor? = null
+
+        fun getInstance(paint: Paint, shapes: MutableList<Shape>): MyEditor {
+            if (instance == null) {
+                synchronized(this) {
+                    if (instance == null) {
+                        instance = MyEditor(paint, shapes)
+                    }
+                }
+            }
+            return instance!!
+        }
+    }
+
+
     private var currentShape: Shape = Shape(paint)
     private val shapesSize: Int = 114
 
