@@ -31,7 +31,8 @@ class CustomCanvas @JvmOverloads constructor(
     }
 
     private val shapes = mutableListOf<Shape>()
-    private var shapeEditor = MyEditor(paint, shapes)
+
+    private var shapeEditor = MyEditor.getInstance(paint, shapes)
 
     enum class ShapeOption {
         POINT, LINE, RECT, ELLIPSE, LINE_CIRCLES, CUBE
