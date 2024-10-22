@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.example.lab_5.shapeHelper.ShapeData
+import com.example.lab_5.shapeHelper.ShapeHelper
 import com.example.lab_5.shapes.CubeShape
 import com.example.lab_5.shapes.EllipseShape
 import com.example.lab_5.shapes.LineCirclesShape
@@ -20,6 +22,7 @@ class CustomCanvas @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
     private val paint = Paint().apply {
         color = Color.BLACK
         isAntiAlias = true
@@ -31,8 +34,15 @@ class CustomCanvas @JvmOverloads constructor(
     }
 
     private val shapes = mutableListOf<Shape>()
-
     private var shapeEditor = MyEditor.getInstance(paint, shapes)
+
+    // Define a callback interface for shape data changes
+    interface OnShapeDataChangedListener {
+        fun onShapeDataChanged(shapesData: List<ShapeData>)
+    }
+
+    // Listener to notify whenever shapes change
+    var onShapeDataChangedListener: OnShapeDataChangedListener? = null
 
     enum class ShapeOption {
         POINT, LINE, RECT, ELLIPSE, LINE_CIRCLES, CUBE
@@ -47,6 +57,12 @@ class CustomCanvas @JvmOverloads constructor(
         ShapeOption.CUBE to { CubeShape(paint) }
     )
 
+    private val shapeHelper = ShapeHelper(context)
+
+    fun getShapesData(): List<ShapeData> {
+        return shapeHelper.getAllShapesData(shapes)
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -54,7 +70,10 @@ class CustomCanvas @JvmOverloads constructor(
                 performClick()
             }
             MotionEvent.ACTION_MOVE -> handleTouchMove(event.x, event.y)
-            MotionEvent.ACTION_UP -> handleTouchUp()
+            MotionEvent.ACTION_UP -> {
+                handleTouchUp()
+                onShapeDataChangedListener?.onShapeDataChanged(getShapesData())
+            }
         }
         return true
     }
@@ -70,8 +89,8 @@ class CustomCanvas @JvmOverloads constructor(
     }
 
     private fun handleTouchUp() {
-        invalidate()
         shapeEditor.onTouchUp()
+        invalidate()
     }
 
     fun setShapeEditor(selectedShape: ShapeOption) {
