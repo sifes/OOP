@@ -4,13 +4,20 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import android.widget.Toast
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.ViewModelProvider
+import com.example.lab_5.shapeHelper.ShapeData
+import com.example.lab_5.shapeHelper.ShapeViewModel
+import com.example.lab_5.table.MyTable
 
 class MainActivity : AppCompatActivity() {
   private lateinit var customCanvas: CustomCanvas
@@ -53,6 +60,22 @@ class MainActivity : AppCompatActivity() {
 
     customCanvas = findViewById(R.id.customCanvas)
     customCanvas.setShapeEditor(currentShape)
+    val myTable: MyTable = findViewById(R.id.myTable)
+
+    val shapeViewModel: ShapeViewModel = ViewModelProvider(this)[ShapeViewModel::class.java]
+    val shapesData = customCanvas.getShapesData()
+    myTable.updateShapesData(shapesData)
+
+    shapeViewModel.shapesData.observe(this) { shapes ->
+      myTable.updateShapesData(shapes)
+    }
+
+    customCanvas.onShapeDataChangedListener = object : CustomCanvas.OnShapeDataChangedListener {
+      override fun onShapeDataChanged(shapesData: List<ShapeData>) {
+        shapeViewModel.updateShapesData(shapesData)
+      }
+    }
+
     showSystemBars()
   }
 
@@ -62,9 +85,7 @@ class MainActivity : AppCompatActivity() {
       customCanvas.setShapeEditor(currentShape)
       updateMenuCheckState(currentShape)
       updateToolbar(currentShape)
-      showCustomNotify(currentShape)
     }
-
     showCustomNotify(currentShape)
   }
 
@@ -80,11 +101,36 @@ class MainActivity : AppCompatActivity() {
     menuInflater.inflate(R.menu.menu_main, menu)
     mainMenu = menu!!
 
+    val toggleTableMenuButton = mainMenu.findItem(R.id.toggleTableMenuButton)
+    val toggleTableButton: Button = findViewById(R.id.toggleTableButton)
+    val myTableScroll: ScrollView = findViewById(R.id.myTableScroll)
+
+    toggleTableButton.setOnClickListener {
+      toggleTableVisibility(myTableScroll, toggleTableButton, toggleTableMenuButton)
+    }
+
+    toggleTableMenuButton.setOnMenuItemClickListener {
+      toggleTableVisibility(myTableScroll, toggleTableButton, toggleTableMenuButton)
+      true
+    }
+
     updateToolbar(currentShape)
     updateMenuCheckState(currentShape)
     showCustomNotify(currentShape)
 
     return true
+  }
+
+  private fun toggleTableVisibility(myTableScroll: ScrollView, toggleTableButton: Button, toggleTableMenuButton: MenuItem ){
+    if (myTableScroll.visibility == View.GONE) {
+      myTableScroll.visibility = View.VISIBLE
+      toggleTableButton.text = "Hide Table"
+      toggleTableMenuButton.title = "Hide Table"
+    } else {
+      myTableScroll.visibility = View.GONE
+      toggleTableMenuButton.title = "Show Table"
+      toggleTableButton.text = "Show Table"
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -111,40 +157,31 @@ class MainActivity : AppCompatActivity() {
       mainMenu.findItem(shapeInfo.iconId).setIcon(shapeInfo.disabledIconResId)
     }
 
-    selectedShapeInfo?.let {
-      supportActionBar?.title = it.title
-      setToolbarIcon(it.enabledIconResId)
-      mainMenu.findItem(it.iconId).setIcon(it.enabledIconResId)
+    selectedShapeInfo?.let { shapeInfo ->
+      supportActionBar?.apply {
+        title = shapeInfo.title
+        setDisplayShowHomeEnabled(true)
+        setIcon(shapeInfo.enabledIconResId)
+      }
+      mainMenu.findItem(shapeInfo.iconId).setIcon(shapeInfo.enabledIconResId)
     }
   }
 
 
+
   private fun showCustomNotify(selectedShape: CustomCanvas.ShapeOption) {
-    val shapeInfo = shapeInfoMap[selectedShape]
-
-    shapeInfo?.let {
+    shapeInfoMap[selectedShape]?.let { shapeInfo ->
       currentToast?.cancel()
-
       val toastLayout = layoutInflater.inflate(R.layout.custom_toast, null)
       val toastIcon = toastLayout.findViewById<ImageView>(R.id.toast_icon)
       val toastMessage = toastLayout.findViewById<TextView>(R.id.toast_message)
-
-      toastIcon.setImageResource(it.enabledIconResId)
-      toastMessage.text = it.title
-
+      toastIcon.setImageResource(shapeInfo.enabledIconResId)
+      toastMessage.text = shapeInfo.title
       currentToast = Toast(this).apply {
         duration = Toast.LENGTH_SHORT
         view = toastLayout
       }
-
       currentToast?.show()
-    }
-  }
-
-  private fun setToolbarIcon(iconResId: Int) {
-    supportActionBar?.apply {
-      setDisplayShowHomeEnabled(true)
-      setIcon(iconResId)
     }
   }
 
