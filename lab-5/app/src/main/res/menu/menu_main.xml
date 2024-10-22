@@ -76,4 +76,10 @@
       app:tooltipText="Намалювати еліпс"
       android:icon="@drawable/ellipse_disabled"/>
 
+  <item
+      android:id="@+id/toggleTableMenuButton"
+      android:title="Show Table"
+      app:showAsAction="never"
+      android:background="@drawable/menu_item_background"/>
+
 </menu>
