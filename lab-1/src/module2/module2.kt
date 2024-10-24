@@ -9,15 +9,21 @@ fun showSecondModuleDialog() {
     frame.isVisible = false
 
     val dialog = JDialog(frame, "Second Dialog", true)
+
     val groupNames = arrayOf("IM", "ІП", "IС", "IА" , "IК", "IО")
+
     val list = JList(groupNames)
+
     val yesButton = JButton("Yes")
     val cancelButton = JButton("Cancel")
+
     val messageLabel = JLabel()
+
     val panel = JPanel()
 
     yesButton.addActionListener {
         val selectedGroup = list.selectedValue
+
         if (selectedGroup != null) {
             messageLabel.text = "Selected: $selectedGroup"
         } else {
@@ -26,15 +32,16 @@ fun showSecondModuleDialog() {
     }
 
     cancelButton.addActionListener {
-        dialog.dispose()
+        dialog.dispose() // Close the dialog when "Cancel" is clicked.
     }
 
-    panel.add(JScrollPane(list))
-    panel.add(yesButton)
-    panel.add(cancelButton)
-    panel.add(messageLabel)
+    panel.add(JScrollPane(list)) // Add the list inside a scroll pane (to handle large lists).
+    panel.add(yesButton) // Add the "Yes" button to the panel.
+    panel.add(cancelButton) // Add the "Cancel" button to the panel.
+    panel.add(messageLabel) // Add the label to display messages.
 
     dialog.add(panel)
+
     dialog.setSize(400, 400)
-    dialog.isVisible = true
+    dialog.isVisible = true // Show the dialog.
 }
