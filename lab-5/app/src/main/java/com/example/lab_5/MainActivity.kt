@@ -15,8 +15,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.lab_5.shapeHelper.ShapeData
-import com.example.lab_5.shapeHelper.ShapeViewModel
+import com.example.lab_5.shapeHelpers.ShapeData
+import com.example.lab_5.shapeHelpers.ShapeFileManager
+import com.example.lab_5.shapeHelpers.ShapeViewModel
 import com.example.lab_5.table.MyTable
 
 class MainActivity : AppCompatActivity() {
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     val myTable: MyTable = findViewById(R.id.myTable)
 
     val shapeViewModel: ShapeViewModel = ViewModelProvider(this)[ShapeViewModel::class.java]
+    val shapeFileManager = ShapeFileManager(this)
     val shapesData = customCanvas.getShapesData()
     myTable.updateShapesData(shapesData)
 
@@ -73,11 +75,16 @@ class MainActivity : AppCompatActivity() {
     customCanvas.onShapeDataChangedListener = object : CustomCanvas.OnShapeDataChangedListener {
       override fun onShapeDataChanged(shapesData: List<ShapeData>) {
         shapeViewModel.updateShapesData(shapesData)
+        shapesData.forEach { shapeData ->
+          shapeFileManager.saveShapeToFile(shapeData)
+        }
       }
     }
 
     showSystemBars()
   }
+
+
 
   private fun setCurrentShape(primitive: CustomCanvas.ShapeOption) {
     if (currentShape != primitive) {

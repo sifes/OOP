@@ -1,4 +1,4 @@
-package com.example.lab_5.shapeHelper
+package com.example.lab_5.shapeHelpers
 
 import android.content.Context
 import com.example.lab_5.R
