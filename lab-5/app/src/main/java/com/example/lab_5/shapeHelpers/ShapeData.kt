@@ -1,4 +1,4 @@
-package com.example.lab_5.shapeHelper
+package com.example.lab_5.shapeHelpers
 
 data class ShapeData(
   val shapeName: String,
