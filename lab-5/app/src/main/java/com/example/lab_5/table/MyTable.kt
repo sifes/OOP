@@ -7,7 +7,7 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.lab_5.R
-import com.example.lab_5.shapeHelper.ShapeData
+import com.example.lab_5.shapeHelpers.ShapeData
 
 class MyTable @JvmOverloads constructor(
   context: Context,
@@ -38,35 +38,11 @@ class MyTable @JvmOverloads constructor(
         background = context.getDrawable(R.drawable.table_row_border)
       }
 
-      val shapeNameTextView = TextView(context).apply {
-        text = shape.shapeName
-        setPadding(12, 8, 12, 8)
-        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f) // Weight 1 for shapeName
-      }
-
-      val x1TextView = TextView(context).apply {
-        text = shape.startX.toString()
-        setPadding(12, 8, 12, 8)
-        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f) // Weight 0.25 for x1
-      }
-
-      val y1TextView = TextView(context).apply {
-        text = shape.startY.toString()
-        setPadding(12, 8, 12, 8)
-        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f) // Weight 0.25 for y1
-      }
-
-      val x2TextView = TextView(context).apply {
-        text = shape.endX.toString()
-        setPadding(12, 8, 12, 8)
-        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f) // Weight 0.25 for x2
-      }
-
-      val y2TextView = TextView(context).apply {
-        text = shape.endY.toString()
-        setPadding(12, 8, 12, 8)
-        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f) // Weight 0.25 for y2
-      }
+      val shapeNameTextView = createTextView(context, shape.shapeName, 1f)
+      val x1TextView = createTextView(context, shape.startX.toString(), 0.25f)
+      val y1TextView = createTextView(context, shape.startY.toString(), 0.25f)
+      val x2TextView = createTextView(context, shape.endX.toString(), 0.25f)
+      val y2TextView = createTextView(context, shape.endY.toString(), 0.25f)
 
       tableRow.addView(shapeNameTextView)
       tableRow.addView(x1TextView)
@@ -78,4 +54,11 @@ class MyTable @JvmOverloads constructor(
     }
   }
 
+ private  fun createTextView(context: Context, text: String, weight: Float): TextView {
+    return TextView(context).apply {
+      this.text = text
+      setPadding(12, 8, 12, 8)
+      layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, weight)
+    }
+  }
 }

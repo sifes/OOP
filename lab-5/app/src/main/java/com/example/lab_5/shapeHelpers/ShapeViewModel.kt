@@ -1,4 +1,4 @@
-package com.example.lab_5.shapeHelper
+package com.example.lab_5.shapeHelpers
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
