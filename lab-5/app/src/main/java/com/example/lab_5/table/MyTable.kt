@@ -16,6 +16,8 @@ class MyTable @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
   private val tableLayout: TableLayout
+  private var selectedRow: TableRow? = null
+  private var onShapeSelectedListener: ((Int) -> Unit)? = null
 
   init {
     inflate(context, R.layout.table_shapes, this)
@@ -33,9 +35,12 @@ class MyTable @JvmOverloads constructor(
   }
 
   private fun setShapesData(shapesData: List<ShapeData>) {
-    for (shape in shapesData) {
+    for ((index, shape) in shapesData.withIndex()) {
       val tableRow = TableRow(context).apply {
         background = context.getDrawable(R.drawable.table_row_border)
+        setOnClickListener {
+          handleRowSelection(this, index)
+        }
       }
 
       val shapeNameTextView = createTextView(context, shape.shapeName, 1f)
@@ -54,7 +59,16 @@ class MyTable @JvmOverloads constructor(
     }
   }
 
- private  fun createTextView(context: Context, text: String, weight: Float): TextView {
+  private fun handleRowSelection(row: TableRow, index: Int) {
+    selectedRow?.background = context.getDrawable(R.drawable.table_row_border)
+
+    selectedRow = row
+    row.background = context.getDrawable(R.drawable.table_row_selected)
+
+    onShapeSelectedListener?.invoke(index)
+  }
+
+  private fun createTextView(context: Context, text: String, weight: Float): TextView {
     return TextView(context).apply {
       this.text = text
       setPadding(12, 8, 12, 8)
