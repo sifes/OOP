@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import kotlin.math.abs
 
-class CubeShape(override val paint: Paint) : RectShape(paint) {
+class CubeShape(override val paint: Paint) : RectShape(paint), DrawableLine {
     override fun draw(canvas: Canvas) {
         if (rubbedTrace) setRubbedTraceDrawing() else setDrawConfig()
 
@@ -25,10 +25,10 @@ class CubeShape(override val paint: Paint) : RectShape(paint) {
         canvas.drawRect(frontLeftX, frontTopY, frontRightX, frontBottomY, paint)
         canvas.drawRect(backLeftX, backTopY, backRightX, backBottomY, paint)
 
-        canvas.drawLine(frontLeftX, frontBottomY, backLeftX, backBottomY, paint)
-        canvas.drawLine(frontRightX, frontTopY, backRightX, backTopY, paint)
-        canvas.drawLine(frontLeftX, frontTopY, backLeftX, backTopY, paint)
-        canvas.drawLine(frontRightX, frontBottomY, backRightX, backBottomY, paint)
+        drawLine(canvas, frontLeftX, frontBottomY, backLeftX, backBottomY, paint)
+        drawLine(canvas, frontRightX, frontTopY, backRightX, backTopY, paint)
+        drawLine(canvas, frontLeftX, frontTopY, backLeftX, backTopY, paint)
+        drawLine(canvas, frontRightX, frontBottomY, backRightX, backBottomY, paint)
     }
 
     override fun setDrawConfig() {
@@ -38,5 +38,9 @@ class CubeShape(override val paint: Paint) : RectShape(paint) {
             style = Paint.Style.STROKE
             strokeWidth = 5f
         }
+    }
+
+    override fun drawLine(canvas: Canvas, startX: Float, startY: Float, endX: Float, endY: Float, paint: Paint) {
+        canvas.drawLine(startX, startY, endX, endY, paint)
     }
 }

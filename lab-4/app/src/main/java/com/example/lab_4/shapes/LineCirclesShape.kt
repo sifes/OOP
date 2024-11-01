@@ -4,10 +4,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 
-class LineCirclesShape(override val paint: Paint) : LineShape(paint) {
+class LineCirclesShape(override val paint: Paint) : LineShape(paint), DrawableLine {
     override fun draw (canvas: Canvas) {
-        super.draw(canvas)
         setDrawConfig()
+        drawLine(canvas, startX, startY, endX, endY, paint)
         canvas.drawCircle(startX, startY, 20f, paint)
         canvas.drawCircle(endX, endY, 20f, paint)
     }
@@ -19,5 +19,9 @@ class LineCirclesShape(override val paint: Paint) : LineShape(paint) {
             style = Paint.Style.FILL
             strokeWidth = 5f
         }
+    }
+
+    override fun drawLine(canvas: Canvas, startX: Float, startY: Float, endX: Float, endY: Float, paint: Paint) {
+        canvas.drawLine(startX, startY, endX, endY, paint)
     }
 }
