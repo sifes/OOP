@@ -1,0 +1,66 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
+
+  <!-- Existing AppBarLayout -->
+  <com.google.android.material.appbar.AppBarLayout
+      android:id="@+id/appBar"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <!-- Custom Canvas -->
+  <com.example.lab_5.CustomCanvas
+      android:id="@+id/customCanvas"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:fillViewport="true"
+      app:layout_constraintTop_toBottomOf="@id/appBar"
+      app:layout_constraintBottom_toTopOf="@id/myTableScroll"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+  <Button
+      android:id="@+id/toggleTableButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Show Table"
+      app:layout_constraintBottom_toTopOf="@id/myTableScroll"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      />
+
+  <ScrollView
+      android:id="@+id/myTableScroll"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHeight_percent="0.33"
+      android:visibility="gone"
+      android:fillViewport="true"
+      >
+
+    <com.example.lab_5.table.MyTable
+        android:id="@+id/myTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:background="@drawable/table_row_border" />
+  </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
