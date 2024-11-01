@@ -17,7 +17,7 @@ class MyTable @JvmOverloads constructor(
 
   private val tableLayout: TableLayout
   private var selectedRow: TableRow? = null
-  var onShapeSelectedListener: ((Int) -> Unit)? = null
+  private var onShapeSelectedListener: ((Int) -> Unit)? = null
 
   init {
     inflate(context, R.layout.table_shapes, this)

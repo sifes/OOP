@@ -3,7 +3,6 @@ package com.example.lab_4.shapes
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-
 class LineCirclesShape(override val paint: Paint) : LineShape(paint), DrawableLine {
     override fun draw (canvas: Canvas) {
         setDrawConfig()
